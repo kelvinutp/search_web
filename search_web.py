@@ -1,5 +1,6 @@
 #monitors specific website for changes in URLs
 
+import os
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -13,23 +14,65 @@ import pyautogui as pi
 #[:16] yyyy-mm-dd hh:mm
 #[:19] yyyy-mm-dd hh:mm:ss
 
+def get_urls():
+    '''
 
-date=str(datetime.now())[:10]+'\n'
+    extracts all the links present on currently active website\n
+    returns two (2) list type object
+    '''
+    time.sleep(5)
+    links=[]
+    incomp_links=[]
+    print('getting urls')
+    for z in range(2):
+        contenido=BeautifulSoup(driver.page_source,'html.parser')
+        for a in contenido.find_all('a'):
+            if a.get('href')!=None and 'http' in a.get('href'):
+                if a.get('href') not in links:
+                    links.append(a.get('href'))
+            else:
+                if a.get('href') not in incomp_links:
+                    incomp_links.append(a.get('href')) #incomplete links
+        pi.press('end',presses=2)
+    return links,incomp_links
+    
+def save_content(dest='Downloads',name=''):
+    '''
+    used for saving PDF or images
 
-driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
-url=r'https://utp.ac.pa/sites/default/files/documentos/2023/pdf/calendario-1-semestre-2023-web.pdf'#pagina web que desea monitorear
+    dest: destination where file will be saved, default destination is 'Downloads' \n\n
+    name: file name. If no name is provided, it will be saved by the name provided by the browser
+    '''
+    print('guardando PDF/imagen')
+    pi.hotkey('ctrl','s',interval=0.5)
+    if name!='':
+        pi.write(name)
+    time.sleep(5)
+    pi.hotkey('ctrl','l',interval=1)
+    pi.write(dest)
+    pi.press('enter')
+    time.sleep(5)
+    pi.press('enter',presses=3,interval=1)
+    return os.path.join(dest,name)
 
-driver.get(url)
 
-pi.hotkey('ctrl','s')
-time.sleep(1)
-pi.hotkey('ctrl','L')
-pi.write('Downloads')
-time.sleep(10)
-pi.write('calendario')
+    
 
-pi.hotkey('enter')
 
-time.sleep(10)
+if __name__=='__main__':
+    date=str(datetime.now())[:10]+'\n'
 
-driver.quit()
+    r=r'C:\Users\CIDETYS-AIP\Desktop\python'
+    #uses microsoft Edge (for windows systems)
+    driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+    # url=input('Ingrese url: ')
+    url=r'https://www.instagram.com/cidetysaip/'
+    # url=r'https://utp.ac.pa/calendarios'
+    #open webpage
+    driver.get(url)
+
+    # print(save_content(dest=r, name='calendario'))
+    print(get_urls())
+    time.sleep(10)
+
+    driver.quit()
