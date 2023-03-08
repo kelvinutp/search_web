@@ -14,18 +14,21 @@ import pyautogui as pi
 #[:16] yyyy-mm-dd hh:mm
 #[:19] yyyy-mm-dd hh:mm:ss
 
-def get_urls():
+def get_urls(class_='', id=''):
     '''
 
     extracts all the links present on currently active website\n
     returns two (2) list type object
+    class_= class within HTML (optional)
+    id= id within HTML (optional)
     '''
     time.sleep(5)
     links=[]
     incomp_links=[]
     print('getting urls')
-    for z in range(2):
-        contenido=BeautifulSoup(driver.page_source,'html.parser')
+    for z in range(2):#el for es por si acaso hay que hacer scroll down
+        estado_actual=BeautifulSoup(driver.page_source,'html.parser')
+        contenido=estado_actual.find_all(class_=class_)[0]
         for a in contenido.find_all('a'):
             if a.get('href')!=None and 'http' in a.get('href'):
                 if a.get('href') not in links:
@@ -66,13 +69,14 @@ if __name__=='__main__':
     #uses microsoft Edge (for windows systems)
     driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
     # url=input('Ingrese url: ')
-    url=r'https://www.instagram.com/cidetysaip/'
+    # url=r'https://www.instagram.com/cidetysaip/'
+    url=r'https://www.senacyt.gob.pa/convocatorias-redireccion/'
     # url=r'https://utp.ac.pa/calendarios'
     #open webpage
     driver.get(url)
 
     # print(save_content(dest=r, name='calendario'))
-    print(get_urls())
+    print(get_urls(class_='sidebar-before-loop'))
     time.sleep(10)
 
     driver.quit()
